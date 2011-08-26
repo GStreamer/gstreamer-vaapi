@@ -745,9 +745,9 @@ gst_vaapiconvert_prepare_output_buffer(
         buffer = gst_vaapi_video_buffer_new_from_pool(convert->surfaces);
         if (!buffer)
             return GST_FLOW_UNEXPECTED;
+        gst_buffer_set_caps(buffer, caps);
     }
 
-    gst_buffer_set_caps(buffer, caps);
     *poutbuf = buffer;
     return GST_FLOW_OK;
 }
