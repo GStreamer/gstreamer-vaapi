@@ -1,8 +1,10 @@
 plugin_LTLIBRARIES = libgstvaapi.la
 
 libgstvaapi_CFLAGS = \
-	$(LIBVA_CFLAGS)		\
-	-I$(top_srcdir)/gst-libs
+	$(LIBVA_CFLAGS)			\
+	-I$(top_srcdir)/gst-libs	\
+	-I$(top_builddir)/gst-libs	\
+	$(NULL)
 
 if USE_VAAPI_GLX
 libgstvaapi_LIBS = \
