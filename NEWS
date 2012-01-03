@@ -1,8 +1,8 @@
-gst-vaapi NEWS -- summary of changes.  2011-12-DD
+gst-vaapi NEWS -- summary of changes.  2011-12-16
 Copyright (C) 2010-2011 Splitted-Desktop Systems
 Copyright (C) 2011 Intel Corporation
 
-Version 0.2.8 - DD.Dec.2011
+Version 0.2.8 - 16.Dec.2011
 * Group all plugins into the same bundle
 * Add support for partial VA image updates
 * Use new XOverlay API (Sreerenj Balachandran)
