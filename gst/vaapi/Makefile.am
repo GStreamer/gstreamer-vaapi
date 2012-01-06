@@ -6,7 +6,7 @@ libgstvaapi_CFLAGS = \
 	-I$(top_builddir)/gst-libs	\
 	$(NULL)
 
-if USE_VAAPI_GLX
+if USE_VAAPISINK_GLX
 libgstvaapi_LIBS = \
 	$(top_builddir)/gst-libs/gst/vaapi/libgstvaapi-glx-$(GST_MAJORMINOR).la
 else
