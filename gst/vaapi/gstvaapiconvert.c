@@ -409,6 +409,7 @@ gst_vaapiconvert_transform_caps(
     GstCaps *out_caps = NULL;
     GstStructure *structure;
     const GValue *v_width, *v_height, *v_framerate, *v_par;
+    guint i, n_structures;
 
     g_return_val_if_fail(GST_IS_CAPS(caps), NULL);
 
@@ -442,13 +443,16 @@ gst_vaapiconvert_transform_caps(
         }
     }
 
-    structure = gst_caps_get_structure(out_caps, 0);
-    gst_structure_set_value(structure, "width", v_width);
-    gst_structure_set_value(structure, "height", v_height);
-    if (v_framerate)
-        gst_structure_set_value(structure, "framerate", v_framerate);
-    if (v_par)
-        gst_structure_set_value(structure, "pixel-aspect-ratio", v_par);
+    n_structures = gst_caps_get_size(out_caps);
+    for (i = 0; i < n_structures; i++) {
+        structure = gst_caps_get_structure(out_caps, i);
+        gst_structure_set_value(structure, "width", v_width);
+        gst_structure_set_value(structure, "height", v_height);
+        if (v_framerate)
+            gst_structure_set_value(structure, "framerate", v_framerate);
+        if (v_par)
+            gst_structure_set_value(structure, "pixel-aspect-ratio", v_par);
+    }
     return out_caps;
 }
 
