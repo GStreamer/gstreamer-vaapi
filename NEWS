@@ -1,8 +1,8 @@
-gst-vaapi NEWS -- summary of changes.  2012-01-DD
+gst-vaapi NEWS -- summary of changes.  2012-01-16
 Copyright (C) 2010-2011 Splitted-Desktop Systems
 Copyright (C) 2011-2012 Intel Corporation
 
-Version 0.2.10 - DD.Jan.2012
+Version 0.2.10 - 16.Jan.2012
 * Add support for GstXOverlay::set_render_rectangle() in vaapisink
 * Fix memory leak of GL texture (Nicolas Dufresne)
 * Fix vaapisink to automatically fit video to window
