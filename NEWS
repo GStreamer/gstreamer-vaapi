@@ -1,6 +1,6 @@
 gst-vaapi NEWS -- summary of changes.  2012-01-DD
 Copyright (C) 2010-2011 Splitted-Desktop Systems
-Copyright (C) 2011 Intel Corporation
+Copyright (C) 2011-2012 Intel Corporation
 
 Version 0.2.10 - DD.Jan.2012
 * Add support for GstXOverlay::set_render_rectangle() in vaapisink
