@@ -465,7 +465,7 @@ gst_vaapisink_set_caps(GstBaseSink *base_sink, GstCaps *caps)
 {
     GstVaapiSink * const sink = GST_VAAPISINK(base_sink);
     GstStructure * const structure = gst_caps_get_structure(caps, 0);
-    guint win_width, win_height;
+    guint win_width, win_height, display_width, display_height;
     gint video_width, video_height, video_par_n = 1, video_par_d = 1;
 
     if (!structure)
@@ -482,8 +482,12 @@ gst_vaapisink_set_caps(GstBaseSink *base_sink, GstCaps *caps)
     sink->video_par_d  = video_par_d;
     GST_DEBUG("video pixel-aspect-ratio %d/%d", video_par_n, video_par_d);
 
-    if (sink->fullscreen)
-        gst_vaapi_display_get_size(sink->display, &win_width, &win_height);
+    gst_vaapi_display_get_size(sink->display, &display_width, &display_height);
+    if (sink->fullscreen ||
+        video_width > display_width || video_height > display_height) {
+        win_width  = display_width;
+        win_height = display_height;
+    }
     else {
         win_width  = video_width;
         win_height = video_height;
