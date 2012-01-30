@@ -78,6 +78,7 @@ libgstvaapi_source_priv_h =			\
 	gstvaapiobject_priv.h			\
 	gstvaapiutils.h				\
 	gstvaapiutils_gst.h			\
+	sysdeps.h				\
 	$(libgst_vaapi_ffmpeg_source_priv_h)	\
 	$(NULL)
 

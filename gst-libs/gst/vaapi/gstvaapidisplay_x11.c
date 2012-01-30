@@ -24,7 +24,7 @@
  * @short_description: VA/X11 display abstraction
  */
 
-#include "config.h"
+#include "sysdeps.h"
 #include "gstvaapiutils.h"
 #include "gstvaapidisplay_priv.h"
 #include "gstvaapidisplay_x11.h"

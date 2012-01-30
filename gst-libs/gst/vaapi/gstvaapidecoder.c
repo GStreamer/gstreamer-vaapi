@@ -25,7 +25,7 @@
  * @short_description: VA decoder abstraction
  */
 
-#include "config.h"
+#include "sysdeps.h"
 #include <assert.h>
 #include <string.h>
 #include "gstvaapicompat.h"
