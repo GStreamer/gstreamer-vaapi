@@ -70,6 +70,7 @@ libgstvaapi_source_h =				\
 	$(NULL)
 
 libgstvaapi_source_priv_h =			\
+	glibcompat.h				\
 	gstvaapi_priv.h				\
 	gstvaapicompat.h			\
 	gstvaapidebug.h				\
