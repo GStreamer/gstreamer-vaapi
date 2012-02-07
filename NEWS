@@ -1,8 +1,8 @@
-gst-vaapi NEWS -- summary of changes.  2012-0D-DD
+gst-vaapi NEWS -- summary of changes.  2012-02-07
 Copyright (C) 2010-2011 Splitted-Desktop Systems
 Copyright (C) 2011-2012 Intel Corporation
 
-Version 0.2.11 - DD.Feb.2012
+Version 0.2.11 - 07.Feb.2012
 * Fix build with newer GLib versions
 * Fix GstPadTemplate leaks in plug-ins
 * Fix vaapisink to cap window size to the maximum display size
