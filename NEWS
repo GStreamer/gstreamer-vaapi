@@ -3,6 +3,7 @@ Copyright (C) 2010-2011 Splitted-Desktop Systems
 Copyright (C) 2011-2012 Intel Corporation
 
 Version 0.2.12 - DD.Apr.2012
+* Don't forcibly resize user provided X windows (Holger Kaelberer)
 * Recalculate render rect only if caps are negotiated (Holger Kaelberer)
 
 Version 0.2.11 - 07.Feb.2012
