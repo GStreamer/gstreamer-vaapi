@@ -1,6 +1,9 @@
-gst-vaapi NEWS -- summary of changes.  2012-02-07
+gst-vaapi NEWS -- summary of changes.  2012-04-DD
 Copyright (C) 2010-2011 Splitted-Desktop Systems
 Copyright (C) 2011-2012 Intel Corporation
+
+Version 0.2.12 - DD.Apr.2012
+* Recalculate render rect only if caps are negotiated (Holger Kaelberer)
 
 Version 0.2.11 - 07.Feb.2012
 * Fix build with newer GLib versions
