@@ -291,6 +291,7 @@ gst_vaapi_display_destroy(GstVaapiDisplay *display)
         if (klass->close_display)
             klass->close_display(display);
     }
+    g_static_rec_mutex_free(&priv->mutex);
 }
 
 static gboolean
