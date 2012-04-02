@@ -1,8 +1,8 @@
-gst-vaapi NEWS -- summary of changes.  2012-04-DD
+gst-vaapi NEWS -- summary of changes.  2012-04-02
 Copyright (C) 2010-2011 Splitted-Desktop Systems
 Copyright (C) 2011-2012 Intel Corporation
 
-Version 0.2.12 - DD.Apr.2012
+Version 0.2.12 - 02.Apr.2012
 * Don't forcibly resize user provided X windows (Holger Kaelberer)
 * Recalculate render rect only if caps are negotiated (Holger Kaelberer)
 * Avoid a hang in playbin2 for some MPEG-2 TS streams (Feng Yuan)
