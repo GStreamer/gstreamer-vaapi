@@ -5,6 +5,9 @@ Copyright (C) 2011-2012 Intel Corporation
 Version 0.2.12 - DD.Apr.2012
 * Don't forcibly resize user provided X windows (Holger Kaelberer)
 * Recalculate render rect only if caps are negotiated (Holger Kaelberer)
+* Avoid a hang in playbin2 for some MPEG-2 TS streams (Feng Yuan)
+* Fix build with VA-API >= 0.34.x
+* Fix crash when downloading/uploading VA images on PowerVR (Cedar Trail)
 
 Version 0.2.11 - 07.Feb.2012
 * Fix build with newer GLib versions
