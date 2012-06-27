@@ -55,14 +55,14 @@ m4_define([gtkdoc_major_version], [1])
 m4_define([gtkdoc_minor_version], [9])
 m4_define([gtkdoc_version], [gtkdoc_major_version.gtkdoc_minor_version])
 
-AC_PREREQ([2.57])
+AC_PREREQ([2.58])
 AC_INIT([gst_vaapi], [gst_vaapi_version],
     [gwenole.beauchesne@intel.com],
     [gstreamer-vaapi])
 AC_CONFIG_SRCDIR([Makefile.am])
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE
-AM_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADERS([config.h])
 
 TODAY="`LC_ALL=C date +'%a, %d %b %Y %X %z'`"
 AC_SUBST(TODAY)
@@ -94,27 +94,27 @@ AM_PROG_CC_C_O
 AC_PROG_LIBTOOL
 
 AC_ARG_ENABLE(glx,
-    AC_HELP_STRING([--enable-glx],
+    AS_HELP_STRING([--enable-glx],
                    [enable OpenGL/X11 @<:@default=yes@:>@]),
     [], [enable_glx="yes"])
 
 AC_ARG_ENABLE(vaapi-glx,
-    AC_HELP_STRING([--enable-vaapi-glx],
+    AS_HELP_STRING([--enable-vaapi-glx],
                    [enable VA/GLX extensions @<:@default=yes@:>@]),
     [], [enable_vaapi_glx="yes"])
 
 AC_ARG_ENABLE(vaapisink-glx,
-    AC_HELP_STRING([--enable-vaapisink-glx],
+    AS_HELP_STRING([--enable-vaapisink-glx],
                    [enable OpenGL/X11 to vaapisink @<:@default=yes@:>@]),
     [], [enable_vaapisink_glx="no"])
 
 AC_ARG_ENABLE(ffmpeg,
-    AC_HELP_STRING([--enable-ffmpeg],
+    AS_HELP_STRING([--enable-ffmpeg],
                    [enable bitstream parsing from FFmpeg @<:@default=no@:>@]),
     [], [enable_ffmpeg="no"])
 
 AC_ARG_ENABLE(codecparsers,
-    AC_HELP_STRING([--enable-codecparsers],
+    AS_HELP_STRING([--enable-codecparsers],
                    [enable adhoc bitstream parsers from GStreamer @<:@default=yes@:>@]),
     [], [enable_codecparsers="yes"])
 
@@ -170,9 +170,10 @@ AC_CACHE_CHECK([for GstBaseSink::query hook], ac_cv_have_gst_base_sink_query, [
     CFLAGS="$CFLAGS $GST_CFLAGS"
     saved_LIBS="$LIBS"
     LIBS="$LIBS $GST_LIBS"
-    AC_TRY_COMPILE(
-        [#include <gst/base/gstbasesink.h>],
-        [GstBaseSinkClass klass; klass.query = NULL;],
+    AC_COMPILE_IFELSE(
+        [AC_LANG_PROGRAM(
+            [[#include <gst/base/gstbasesink.h>]],
+            [[GstBaseSinkClass klass; klass.query = NULL;]])],
         [ac_cv_have_gst_base_sink_query="yes"],
         [ac_cv_have_gst_base_sink_query="no"]
     )
@@ -212,9 +213,10 @@ AC_CACHE_CHECK([for GstVideoOverlayComposition],
     CFLAGS="$CFLAGS $GST_CFLAGS"
     saved_LIBS="$LIBS"
     LIBS="$LIBS $GST_LIBS"
-    AC_TRY_COMPILE(
-        [#include <gst/video/video-overlay-composition.h>],
-        [GstVideoOverlayComposition *c = gst_video_overlay_composition_new(0);],
+    AC_COMPILE_IFELSE(
+        [AC_LANG_PROGRAM(
+            [[#include <gst/video/video-overlay-composition.h>]],
+            [[GstVideoOverlayComposition *c = gst_video_overlay_composition_new(0);]])],
         [ac_cv_have_gst_video_overlay_composition="yes"],
         [ac_cv_have_gst_video_overlay_composition="no"]
     )
@@ -251,17 +253,17 @@ AC_CACHE_CHECK([for GstH264SliceHdr::n_emulation_prevention_bytes],
     CFLAGS="$CFLAGS $GST_CFLAGS $GST_CODEC_PARSERS_CFLAGS"
     saved_LIBS="$LIBS"
     LIBS="$LIBS $GST_LIBS $GST_CODEC_PARSERS_LIBS"
-    AC_TRY_COMPILE(
-        [#include <gst/codecparsers/gsth264parser.h>],
-        [GstH264SliceHdr slice_hdr;
-         slice_hdr.n_emulation_prevention_bytes = 0;],
+    AC_COMPILE_IFELSE(
+        [AC_LANG_PROGRAM(
+            [[#include <gst/codecparsers/gsth264parser.h>]],
+            [[GstH264SliceHdr slice_hdr;
+              slice_hdr.n_emulation_prevention_bytes = 0;]])],
         [ac_cv_have_gst_h264_slice_hdr_epb_count="yes"],
         [ac_cv_have_gst_h264_slice_hdr_epb_count="no"]
     )
     CFLAGS="$saved_CFLAGS"
     LIBS="$saved_LIBS"
 ])
-fi
 
 if test "$ac_cv_have_gst_h264_slice_hdr_epb_count" = "yes"; then
     AC_DEFINE_UNQUOTED(HAVE_GST_H264_SLICE_HDR_EPB_COUNT, 1,
@@ -327,11 +329,13 @@ AC_CACHE_CHECK([for old VA-API 0.29],
     CFLAGS="$CFLAGS $LIBVA_CFLAGS"
     saved_LIBS="$LIBS"
     LIBS="$LIBS $LIBVA_LIBS"
-    AC_TRY_LINK(
-    [#include <va_x11.h>],
-    [vaGetDisplay(NULL)],
-    [ac_cv_have_vaapi_old="yes"],
-    [ac_cv_have_vaapi_old="no"])
+    AC_LINK_IFELSE(
+        [AC_LANG_PROGRAM(
+            [[#include <va_x11.h>]],
+            [[vaGetDisplay(NULL)]])],
+        [ac_cv_have_vaapi_old="yes"],
+        [ac_cv_have_vaapi_old="no"]
+    )
     CFLAGS="$saved_CFLAGS"
     LIBS="$saved_LIBS"
 ])
@@ -428,7 +432,7 @@ VA_VERSION_STR="$VA_VERSION"
 pkgconfigdir=${libdir}/pkgconfig
 AC_SUBST(pkgconfigdir)
 
-AC_OUTPUT([
+AC_CONFIG_FILES([
     Makefile
     debian.upstream/Makefile
     debian.upstream/changelog
@@ -465,6 +469,7 @@ pkgconfig/gstreamer-vaapi-x11.pc.in
     gst/vaapi/Makefile
     tests/Makefile
 ])
+AC_OUTPUT
 
 dnl Print summary
 yesno() {
