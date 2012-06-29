@@ -108,7 +108,7 @@ struct _GstVaapiCodecObjectClass {
 };
 
 GType
-gst_vaapi_codec_object_get_type(void)
+gst_vaapi_codec_object_get_type(void) G_GNUC_CONST
     attribute_hidden;
 
 GstVaapiCodecObject *
@@ -183,7 +183,7 @@ struct _GstVaapiIqMatrixClass {
 };
 
 GType
-gst_vaapi_iq_matrix_get_type(void)
+gst_vaapi_iq_matrix_get_type(void) G_GNUC_CONST
     attribute_hidden;
 
 GstVaapiIqMatrix *
@@ -249,7 +249,7 @@ struct _GstVaapiBitPlaneClass {
 };
 
 GType
-gst_vaapi_bitplane_get_type(void)
+gst_vaapi_bitplane_get_type(void) G_GNUC_CONST
     attribute_hidden;
 
 GstVaapiBitPlane *
