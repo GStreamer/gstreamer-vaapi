@@ -107,10 +107,11 @@ struct _GstVaapiCodecObjectClass {
                                 const GstVaapiCodecObjectConstructorArgs *args);
 };
 
+G_GNUC_INTERNAL
 GType
-gst_vaapi_codec_object_get_type(void) G_GNUC_CONST
-    attribute_hidden;
+gst_vaapi_codec_object_get_type(void) G_GNUC_CONST;
 
+G_GNUC_INTERNAL
 GstVaapiCodecObject *
 gst_vaapi_codec_object_new(
     GType              type,
@@ -119,13 +120,14 @@ gst_vaapi_codec_object_new(
     guint              param_size,
     gconstpointer      data,
     guint              data_size
-) attribute_hidden;
+);
 
+G_GNUC_INTERNAL
 gboolean
 gst_vaapi_codec_object_construct(
     GstVaapiCodecObject                      *obj,
     const GstVaapiCodecObjectConstructorArgs *args
-) attribute_hidden;
+);
 
 /* ------------------------------------------------------------------------- */
 /* --- Inverse Quantization Matrices                                     --- */
@@ -182,16 +184,17 @@ struct _GstVaapiIqMatrixClass {
     GstVaapiCodecObjectClass    parent_class;
 };
 
+G_GNUC_INTERNAL
 GType
-gst_vaapi_iq_matrix_get_type(void) G_GNUC_CONST
-    attribute_hidden;
+gst_vaapi_iq_matrix_get_type(void) G_GNUC_CONST;
 
+G_GNUC_INTERNAL
 GstVaapiIqMatrix *
 gst_vaapi_iq_matrix_new(
     GstVaapiDecoder *decoder,
     gconstpointer    param,
     guint            param_size
-) attribute_hidden;
+);
 
 /* ------------------------------------------------------------------------- */
 /* --- VC-1 Bit Planes                                                   --- */
@@ -248,13 +251,13 @@ struct _GstVaapiBitPlaneClass {
     GstVaapiCodecObjectClass    parent_class;
 };
 
+G_GNUC_INTERNAL
 GType
-gst_vaapi_bitplane_get_type(void) G_GNUC_CONST
-    attribute_hidden;
+gst_vaapi_bitplane_get_type(void) G_GNUC_CONST;
 
+G_GNUC_INTERNAL
 GstVaapiBitPlane *
-gst_vaapi_bitplane_new(GstVaapiDecoder *decoder, guint8 *data, guint data_size)
-    attribute_hidden;
+gst_vaapi_bitplane_new(GstVaapiDecoder *decoder, guint8 *data, guint data_size);
 
 /* ------------------------------------------------------------------------- */
 /* --- Helpers to create codec-dependent objects                         --- */
