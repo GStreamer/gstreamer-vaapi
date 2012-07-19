@@ -44,7 +44,6 @@ libgstvaapi_source_c =				\
 	gstvaapisurfacepool.c			\
 	gstvaapisurfaceproxy.c			\
 	gstvaapiutils.c				\
-	gstvaapiutils_tsb.c			\
 	gstvaapivalue.c				\
 	gstvaapivideobuffer.c			\
 	gstvaapivideopool.c			\
@@ -85,7 +84,6 @@ libgstvaapi_source_priv_h =			\
 	gstvaapiobject_priv.h			\
 	gstvaapisurface_priv.h			\
 	gstvaapiutils.h				\
-	gstvaapiutils_tsb.h			\
 	gstvaapivideobuffer_priv.h		\
 	gstvaapiworkarounds.h			\
 	sysdeps.h				\
