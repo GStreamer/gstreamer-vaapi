@@ -271,6 +271,7 @@ AC_CACHE_CHECK([for GstH264SliceHdr::n_emulation_prevention_bytes],
     CFLAGS="$saved_CFLAGS"
     LIBS="$saved_LIBS"
 ])
+fi
 
 if test "$ac_cv_have_gst_h264_slice_hdr_epb_count" = "yes"; then
     AC_DEFINE_UNQUOTED(HAVE_GST_H264_SLICE_HDR_EPB_COUNT, 1,
