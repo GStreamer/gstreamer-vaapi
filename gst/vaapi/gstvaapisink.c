@@ -295,6 +295,14 @@ configure_notify_event_pending(
     return args.match;
 }
 
+static inline gboolean
+gst_vaapisink_ensure_display(GstVaapiSink *sink)
+{
+    if (!gst_vaapi_ensure_display(sink, &sink->display))
+        return FALSE;
+    return TRUE;
+}
+
 static gboolean
 gst_vaapisink_ensure_render_rect(GstVaapiSink *sink, guint width, guint height)
 {
@@ -380,7 +388,7 @@ gst_vaapisink_ensure_window_xid(GstVaapiSink *sink, guintptr window_id)
     int x, y;
     XID xid = window_id;
 
-    if (!gst_vaapi_ensure_display(sink, &sink->display))
+    if (!gst_vaapisink_ensure_display(sink))
         return FALSE;
 
     gst_vaapi_display_lock(sink->display);
@@ -423,7 +431,7 @@ gst_vaapisink_start(GstBaseSink *base_sink)
 {
     GstVaapiSink * const sink = GST_VAAPISINK(base_sink);
 
-    return gst_vaapi_ensure_display(sink, &sink->display);
+    return gst_vaapisink_ensure_display(sink);
 }
 
 static gboolean
@@ -469,7 +477,7 @@ gst_vaapisink_set_caps(GstBaseSink *base_sink, GstCaps *caps)
 
     gst_caps_replace(&sink->caps, caps);
 
-    if (!gst_vaapi_ensure_display(sink, &sink->display))
+    if (!gst_vaapisink_ensure_display(sink))
         return FALSE;
 
     gst_vaapi_display_get_size(sink->display, &display_width, &display_height);
