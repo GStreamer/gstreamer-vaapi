@@ -5,6 +5,7 @@ Copyright (C) 2011 Collabora
 
 Version 0.3.8 - DD.Jul.2012
 * Disable FFmpeg-based decoders by default
+* Fix GLX rendering with FBO + texture-from-pixmap (fallback for VA/GLX)
 
 Version 0.3.7 - 26.Jun.2012
 * Fix vaapidecode to report unsupported codec profiles
