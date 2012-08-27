@@ -30,6 +30,7 @@
 #endif
 
 #include <gst/gst.h>
+#include <gst/vaapi/gstvaapitypes.h>
 #include <gst/vaapi/gstvaapiimageformat.h>
 #include <gst/vaapi/gstvaapiprofile.h>
 
@@ -75,6 +76,12 @@ struct _GstVaapiDisplayInfo {
     VADisplay           va_display;
     gpointer            native_display;
 };
+
+/**
+ * GstVaapiDisplayProperties:
+ * @GST_VAAPI_DISPLAY_PROP_RENDER_MODE: rendering mode (#GstVaapiRenderMode).
+ */
+#define GST_VAAPI_DISPLAY_PROP_RENDER_MODE      "render-mode"
 
 /**
  * GstVaapiDisplay:
@@ -198,6 +205,18 @@ gst_vaapi_display_has_subpicture_format(
 
 gboolean
 gst_vaapi_display_has_property(GstVaapiDisplay *display, const gchar *name);
+
+gboolean
+gst_vaapi_display_get_render_mode(
+    GstVaapiDisplay    *display,
+    GstVaapiRenderMode *pmode
+);
+
+gboolean
+gst_vaapi_display_set_render_mode(
+    GstVaapiDisplay   *display,
+    GstVaapiRenderMode mode
+);
 
 G_END_DECLS
 
