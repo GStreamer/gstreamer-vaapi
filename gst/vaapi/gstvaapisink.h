@@ -85,6 +85,7 @@ struct _GstVaapiSink {
     guint               synchronous     : 1;
     guint               use_glx         : 1;
     guint               use_reflection  : 1;
+    guint               use_overlay     : 1;
 };
 
 struct _GstVaapiSinkClass {

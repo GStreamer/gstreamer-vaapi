@@ -298,8 +298,18 @@ configure_notify_event_pending(
 static inline gboolean
 gst_vaapisink_ensure_display(GstVaapiSink *sink)
 {
+    GstVaapiDisplay * const old_display = sink->display;
+    GstVaapiRenderMode render_mode;
+
     if (!gst_vaapi_ensure_display(sink, &sink->display))
         return FALSE;
+
+    if (sink->display != old_display) {
+        sink->use_overlay =
+            gst_vaapi_display_get_render_mode(sink->display, &render_mode) &&
+            render_mode == GST_VAAPI_RENDER_MODE_OVERLAY;
+        GST_DEBUG("use %s rendering mode", sink->use_overlay ? "overlay" : "texture");
+    }
     return TRUE;
 }
 
@@ -731,7 +741,8 @@ gst_vaapisink_show_frame(GstBaseSink *base_sink, GstBuffer *buffer)
         return GST_FLOW_UNEXPECTED;
 
     /* Retain VA surface until the next one is displayed */
-    gst_buffer_replace(&sink->video_buffer, buffer);
+    if (sink->use_overlay)
+        gst_buffer_replace(&sink->video_buffer, buffer);
     return GST_FLOW_OK;
 }
 
@@ -907,4 +918,5 @@ gst_vaapisink_init(GstVaapiSink *sink)
     sink->synchronous    = FALSE;
     sink->use_glx        = USE_VAAPISINK_GLX;
     sink->use_reflection = FALSE;
+    sink->use_overlay    = FALSE;
 }
