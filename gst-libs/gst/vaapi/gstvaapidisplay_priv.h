@@ -85,6 +85,7 @@ struct _GstVaapiDisplayPrivate {
     GArray             *encoders;
     GArray             *image_formats;
     GArray             *subpicture_formats;
+    GArray             *properties;
     guint               create_display  : 1;
 };
 
