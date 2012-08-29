@@ -35,7 +35,6 @@
 #include <gst/video/video.h>
 #include <gst/video/videocontext.h>
 #include <gst/vaapi/gstvaapivideobuffer.h>
-#include <gst/vaapi/gstvaapivideosink.h>
 #include <gst/vaapi/gstvaapidisplay_x11.h>
 #include <gst/vaapi/gstvaapiwindow_x11.h>
 #if USE_VAAPISINK_GLX
@@ -124,7 +123,7 @@ gst_vaapisink_implements_iface_init(GstImplementsInterfaceClass *iface)
     iface->supported = gst_vaapisink_implements_interface_supported;
 }
 
-/* GstVaapiVideoSink interface */
+/* GstVideoContext interface */
 
 static void
 gst_vaapisink_set_video_context(GstVideoContext *context, const gchar *type,
