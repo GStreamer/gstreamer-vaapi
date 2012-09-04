@@ -129,11 +129,10 @@ struct _GstVaapiRectangle {
  *   backing store, or back buffer of a frame buffer, and is free to
  *   be re-used right away for decoding.
  */
-typedef enum _GstVaapiRenderMode GstVaapiRenderMode;
-enum _GstVaapiRenderMode {
+typedef enum {
     GST_VAAPI_RENDER_MODE_OVERLAY = 1,
     GST_VAAPI_RENDER_MODE_TEXTURE
-};
+} GstVaapiRenderMode;
 
 G_END_DECLS
 
