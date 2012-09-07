@@ -8,6 +8,9 @@ Version 0.3.8 - DD.Jul.2012
 * Add JPEG decoder (based on codecparsers)
 * Fix crash when destroying GstVaapiDisplay objects early
 * Fix GLX rendering with FBO + texture-from-pixmap (fallback for VA/GLX)
+* Fix rendering with EMGD driver when overlay mode is used
+* Fix MPEG-2 decoding on Intel Atom platforms with EMGD driver
+* Fix release of dangling proxy surfaces when decoder is reset (Philip Lorenz)
 
 Version 0.3.7 - 26.Jun.2012
 * Fix vaapidecode to report unsupported codec profiles
