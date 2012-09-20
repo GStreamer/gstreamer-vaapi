@@ -1,9 +1,9 @@
-gst-vaapi NEWS -- summary of changes.  2012-07-DD
+gst-vaapi NEWS -- summary of changes.  2012-09-20
 Copyright (C) 2010-2011 Splitted-Desktop Systems
 Copyright (C) 2011-2012 Intel Corporation
 Copyright (C) 2011 Collabora
 
-Version 0.3.8 - DD.Jul.2012
+Version 0.3.8 - 20.Sep.2012
 * Disable FFmpeg-based decoders by default
 * Add JPEG decoder (based on codecparsers)
 * Fix crash when destroying GstVaapiDisplay objects early
