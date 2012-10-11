@@ -211,41 +211,38 @@ PKG_CHECK_MODULES([GST_BASEVIDEO],
     [gstreamer-basevideo-$GST_MAJORMINOR >= gst_plugins_bad_version])
 
 dnl ... bitstream parsers
-USE_CODEC_PARSERS=1
-USE_LOCAL_CODEC_PARSERS=0
-
 PKG_CHECK_MODULES([GST_CODEC_PARSERS],
     [gstreamer-codecparsers-$GST_MAJORMINOR >= gst_plugins_bad_version])
 
-dnl ... 0.10.23 addition, could be implemented otherwise
-AC_CACHE_CHECK([for GstH264SliceHdr::n_emulation_prevention_bytes],
-    ac_cv_have_gst_h264_slice_hdr_epb_count, [
-    saved_CFLAGS="$CFLAGS"
-    CFLAGS="$CFLAGS $GST_CFLAGS $GST_CODEC_PARSERS_CFLAGS"
+dnl ... H.264 parser, with the required extensions
+AC_CACHE_CHECK([for H.264 parser],
+    ac_cv_have_gst_h264_parser, [
+    saved_CPPFLAGS="$CPPFLAGS"
+    CPPFLAGS="$CPPFLAGS $GST_CFLAGS $GST_CODEC_PARSERS_CFLAGS"
     saved_LIBS="$LIBS"
     LIBS="$LIBS $GST_LIBS $GST_CODEC_PARSERS_LIBS"
     AC_COMPILE_IFELSE(
         [AC_LANG_PROGRAM(
             [[#include <gst/codecparsers/gsth264parser.h>]],
             [[GstH264SliceHdr slice_hdr;
-              slice_hdr.n_emulation_prevention_bytes = 0;]])],
-        [ac_cv_have_gst_h264_slice_hdr_epb_count="yes"],
-        [ac_cv_have_gst_h264_slice_hdr_epb_count="no"]
+              GstH264VUIParams vui_params;
+              slice_hdr.n_emulation_prevention_bytes = 0;
+              vui_params.par_n = 0;
+              vui_params.par_d = 0;]])],
+        [ac_cv_have_gst_h264_parser="yes"],
+        [ac_cv_have_gst_h264_parser="no"]
     )
-    CFLAGS="$saved_CFLAGS"
+    CPPFLAGS="$saved_CPPFLAGS"
     LIBS="$saved_LIBS"
 ])
-
-if test "$ac_cv_have_gst_h264_slice_hdr_epb_count" = "yes"; then
-    AC_DEFINE_UNQUOTED(HAVE_GST_H264_SLICE_HDR_EPB_COUNT, 1,
-        [Defined to 1 if GstH264SliceHdr::n_emulation_prevention_bytes exists.])
-fi
+AM_CONDITIONAL([USE_LOCAL_CODEC_PARSERS_H264],
+    [test "$ac_cv_have_gst_h264_parser" != "yes"])
 
 dnl ... JPEG parser, not upstream yet
 AC_CACHE_CHECK([for JPEG parser],
     ac_cv_have_gst_jpeg_parser, [
-    saved_CFLAGS="$CFLAGS"
-    CFLAGS="$CFLAGS $GST_CFLAGS $GST_CODEC_PARSERS_CFLAGS"
+    saved_CPPFLAGS="$CPPFLAGS"
+    CPPFLAGS="$CPPFLAGS $GST_CFLAGS $GST_CODEC_PARSERS_CFLAGS"
     saved_LIBS="$LIBS"
     LIBS="$LIBS $GST_LIBS $GST_CODEC_PARSERS_LIBS"
     AC_COMPILE_IFELSE(
@@ -253,17 +250,13 @@ AC_CACHE_CHECK([for JPEG parser],
             [[#include <gst/codecparsers/gstjpegparser.h>]],
             [[GstJpegImage jpeg_image;]])],
         [ac_cv_have_gst_jpeg_parser="yes"],
-        [ac_cv_have_gst_jpeg_parser="no" USE_LOCAL_CODEC_PARSERS=1]
+        [ac_cv_have_gst_jpeg_parser="no"]
     )
-    CFLAGS="$saved_CFLAGS"
+    CPPFLAGS="$saved_CPPFLAGS"
     LIBS="$saved_LIBS"
 ])
-
-if test "$ac_cv_have_gst_jpeg_parser" = "yes"; then
-    AC_DEFINE_UNQUOTED(HAVE_GST_JPEG_PARSER, 1,
-        [Defined to 1 if JPEG parser exists.])
-fi
-AM_CONDITIONAL(USE_LOCAL_CODEC_PARSERS, test $USE_LOCAL_CODEC_PARSERS -eq 1)
+AM_CONDITIONAL([USE_LOCAL_CODEC_PARSERS_JPEG],
+    [test "$ac_cv_have_gst_jpeg_parser" != "yes"])
 
 dnl GST_ALL_LDFLAGS:
 dnl LDFLAGS really should only contain flags, not libs - they get added before
@@ -530,6 +523,7 @@ debian.upstream/libgstvaapi-x11.install.in
     docs/reference/libs/libs-docs.xml
     docs/reference/plugins/Makefile
     docs/reference/plugins/plugins-docs.xml
+    ext/Makefile
     gst-libs/Makefile
     gst-libs/gst/Makefile
     gst-libs/gst/codecparsers/Makefile
