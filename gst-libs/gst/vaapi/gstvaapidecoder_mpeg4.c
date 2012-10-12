@@ -798,7 +798,11 @@ decode_slice(
 }
 
 static GstVaapiDecoderStatus
-decode_packet(GstVaapiDecoderMpeg4 *decoder, GstMpeg4Packet packet)
+decode_packet(
+    GstVaapiDecoderMpeg4 *decoder,
+    GstMpeg4Packet packet,
+    gboolean is_eos
+)
 {
     GstVaapiDecoderMpeg4Private * const priv = decoder->priv;
     GstMpeg4Packet *tos = &packet;
@@ -856,7 +860,8 @@ decode_packet(GstVaapiDecoderMpeg4 *decoder, GstMpeg4Packet packet)
         }
         else {
             // next start_code is required to determine the end of last slice
-            _data_size += 4;
+            if (!is_eos)
+                _data_size += 4;
             GstMpeg4ParseResult ret = GST_MPEG4_PARSER_OK;
 
             gboolean first_slice = TRUE;
@@ -864,7 +869,10 @@ decode_packet(GstVaapiDecoderMpeg4 *decoder, GstMpeg4Packet packet)
                 // we can skip user data here
                 ret = gst_mpeg4_parse(&video_packet, TRUE, &priv->vop_hdr, _data, 0,  _data_size);
                 if(ret != GST_MPEG4_PARSER_OK) {
-                    break;
+                    if (!is_eos || ret != GST_MPEG4_PARSER_NO_PACKET_END)
+                        break;
+                    video_packet.size = _data_size - video_packet.offset;
+                    ret = GST_MPEG4_PARSER_OK;
                 }
 
                 if (first_slice) {
@@ -910,19 +918,19 @@ static GstVaapiDecoderStatus
 decode_buffer(GstVaapiDecoderMpeg4 *decoder, GstBuffer *buffer)
 {
     GstVaapiDecoderMpeg4Private * const priv = decoder->priv;
-    GstVaapiDecoderStatus status = GST_VAAPI_DECODER_STATUS_ERROR_UNKNOWN;
+    GstVaapiDecoderStatus status = GST_VAAPI_DECODER_STATUS_SUCCESS;
+    gboolean is_eos, end_of_packet;
     guchar *buf;
     guint pos, buf_size;
 
     buf      = GST_BUFFER_DATA(buffer);
     buf_size = GST_BUFFER_SIZE(buffer);
+    is_eos   = GST_BUFFER_IS_EOS(buffer);
 
-    // visual object sequence end
-    if (!buf && buf_size == 0)
-        return decode_sequence_end(decoder);
-
-    gst_buffer_ref(buffer);
-    gst_adapter_push(priv->adapter, buffer);
+    if (buf && buf_size > 0) {
+        gst_buffer_ref(buffer);
+        gst_adapter_push(priv->adapter, buffer);
+    }
 
     if (priv->sub_buffer) {
         buffer = gst_buffer_merge(priv->sub_buffer, buffer);
@@ -944,7 +952,10 @@ decode_buffer(GstVaapiDecoderMpeg4 *decoder, GstBuffer *buffer)
         while (result == GST_MPEG4_PARSER_OK && pos < buf_size) {
             result = gst_h263_parse (&packet,buf, pos, buf_size);
             if (result != GST_MPEG4_PARSER_OK) {
-                break;
+                if (!is_eos || result != GST_MPEG4_PARSER_NO_PACKET_END)
+                    break;
+                packet.size = pos + buf_size - packet.offset;
+                result = GST_MPEG4_PARSER_OK;
             }
             status = decode_picture(decoder, packet.data+packet.offset, packet.size);
             if (GST_VAAPI_DECODER_STATUS_SUCCESS == status) {
@@ -967,12 +978,17 @@ decode_buffer(GstVaapiDecoderMpeg4 *decoder, GstBuffer *buffer)
     }
     else {
         while (pos < buf_size) {
+            end_of_packet = FALSE;
             // don't skip user data, we need the size to pop tsb buffer
             result = gst_mpeg4_parse(&packet, FALSE, NULL, buf, pos, buf_size);
             if (result != GST_MPEG4_PARSER_OK) {
-                break;
+                if (!is_eos || result != GST_MPEG4_PARSER_NO_PACKET_END)
+                    break;
+                packet.size = pos + buf_size - packet.offset;
+                result = GST_MPEG4_PARSER_OK;
+                end_of_packet = TRUE;
             }
-            status = decode_packet(decoder, packet);
+            status = decode_packet(decoder, packet, end_of_packet);
             if (GST_VAAPI_DECODER_STATUS_SUCCESS == status ||
                 GST_VAAPI_DECODER_STATUS_ERROR_NO_DATA == status) {
                 consumed_size = packet.offset + packet.size - pos; 
@@ -994,6 +1010,10 @@ decode_buffer(GstVaapiDecoderMpeg4 *decoder, GstBuffer *buffer)
         priv->sub_buffer = gst_buffer_create_sub(buffer, pos, buf_size-pos);
         status = GST_VAAPI_DECODER_STATUS_ERROR_NO_DATA;
     }
+
+    if (is_eos && (status == GST_VAAPI_DECODER_STATUS_SUCCESS ||
+                   status == GST_VAAPI_DECODER_STATUS_ERROR_NO_DATA))
+        status = decode_sequence_end(decoder);
     return status;
 }
 
@@ -1024,7 +1044,7 @@ decode_codec_data(GstVaapiDecoderMpeg4 *decoder, GstBuffer *buffer)
         if (result != GST_MPEG4_PARSER_OK) {
             break;
         }
-        status = decode_packet(decoder, packet);
+        status = decode_packet(decoder, packet, FALSE);
         if (GST_VAAPI_DECODER_STATUS_SUCCESS == status) {
             pos = packet.offset + packet.size; 
         }
