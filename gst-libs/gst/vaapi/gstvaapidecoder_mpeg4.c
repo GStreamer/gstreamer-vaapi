@@ -956,8 +956,8 @@ decode_buffer(GstVaapiDecoderMpeg4 *decoder, GstBuffer *buffer)
 
                 consumed_size = packet.offset + packet.size; 
                 pos += consumed_size; 
-                if (gst_adapter_available(priv->adapter) >= pos)
-                    gst_adapter_flush(priv->adapter, pos);
+                if (gst_adapter_available(priv->adapter) >= consumed_size)
+                    gst_adapter_flush(priv->adapter, consumed_size);
             }
             else {
                 GST_WARNING("decode h263 packet failed\n");
@@ -977,8 +977,8 @@ decode_buffer(GstVaapiDecoderMpeg4 *decoder, GstBuffer *buffer)
                 GST_VAAPI_DECODER_STATUS_ERROR_NO_DATA == status) {
                 consumed_size = packet.offset + packet.size - pos; 
                 pos = packet.offset + packet.size; 
-                if (gst_adapter_available(priv->adapter) >= pos)
-                    gst_adapter_flush(priv->adapter, pos);
+                if (gst_adapter_available(priv->adapter) >= consumed_size)
+                    gst_adapter_flush(priv->adapter, consumed_size);
             }
             else {
                 GST_WARNING("decode mp4 packet failed\n");
