@@ -279,8 +279,6 @@ struct _GstVaapiDecoderH264Private {
     guint                       mb_y;
     guint                       mb_width;
     guint                       mb_height;
-    guint8                      scaling_list_4x4[6][16];
-    guint8                      scaling_list_8x8[6][64];
     gint32                      field_poc[2];           // 0:TopFieldOrderCnt / 1:BottomFieldOrderCnt
     gint32                      poc_msb;                // PicOrderCntMsb
     gint32                      poc_lsb;                // pic_order_cnt_lsb (from slice_header())
@@ -658,17 +656,77 @@ ensure_context(GstVaapiDecoderH264 *decoder, GstH264SPS *sps)
     return GST_VAAPI_DECODER_STATUS_SUCCESS;
 }
 
+static void
+fill_iq_matrix_4x4(VAIQMatrixBufferH264 *iq_matrix, const GstH264PPS *pps)
+{
+    const guint8 (* const ScalingList4x4)[6][16] = &pps->scaling_lists_4x4;
+    guint i, j;
+
+    /* There are always 6 4x4 scaling lists */
+    g_assert(G_N_ELEMENTS(iq_matrix->ScalingList4x4) == 6);
+    g_assert(G_N_ELEMENTS(iq_matrix->ScalingList4x4[0]) == 16);
+
+    if (sizeof(iq_matrix->ScalingList4x4[0][0]) == 1)
+        memcpy(iq_matrix->ScalingList4x4, *ScalingList4x4,
+               sizeof(iq_matrix->ScalingList4x4));
+    else {
+        for (i = 0; i < G_N_ELEMENTS(iq_matrix->ScalingList4x4); i++) {
+            for (j = 0; j < G_N_ELEMENTS(iq_matrix->ScalingList4x4[i]); j++)
+                iq_matrix->ScalingList4x4[i][j] = (*ScalingList4x4)[i][j];
+        }
+    }
+}
+
+static void
+fill_iq_matrix_8x8(VAIQMatrixBufferH264 *iq_matrix, const GstH264PPS *pps)
+{
+    const guint8 (* const ScalingList8x8)[6][64] = &pps->scaling_lists_8x8;
+    const GstH264SPS * const sps = pps->sequence;
+    guint i, j, n;
+
+    /* If chroma_format_idc != 3, there are up to 2 8x8 scaling lists */
+    if (!pps->transform_8x8_mode_flag)
+        return;
+
+    g_assert(G_N_ELEMENTS(iq_matrix->ScalingList8x8) >= 2);
+    g_assert(G_N_ELEMENTS(iq_matrix->ScalingList8x8[0]) == 64);
+
+    if (sizeof(iq_matrix->ScalingList8x8[0][0]) == 1)
+        memcpy(iq_matrix->ScalingList8x8, *ScalingList8x8,
+               sizeof(iq_matrix->ScalingList8x8));
+    else {
+        n = (sps->chroma_format_idc != 3) ? 2 : 6;
+        for (i = 0; i < n; i++) {
+            for (j = 0; j < G_N_ELEMENTS(iq_matrix->ScalingList8x8[i]); j++)
+                iq_matrix->ScalingList8x8[i][j] = (*ScalingList8x8)[i][j];
+        }
+    }
+}
+
 static GstVaapiDecoderStatus
-ensure_quant_matrix(GstVaapiDecoderH264 *decoder, GstH264PPS *pps)
+ensure_quant_matrix(GstVaapiDecoderH264 *decoder, GstVaapiPictureH264 *picture)
 {
     GstVaapiDecoderH264Private * const priv = decoder->priv;
+    GstH264SPS * const sps = priv->sps;
+    GstH264PPS * const pps = priv->pps;
+    GstVaapiPicture * const base_picture = &picture->base;
+    VAIQMatrixBufferH264 *iq_matrix;
 
-    if (priv->pps != pps) {
-        memcpy(priv->scaling_list_4x4, pps->scaling_lists_4x4,
-               sizeof(priv->scaling_list_4x4));
-        memcpy(priv->scaling_list_8x8, pps->scaling_lists_8x8,
-               sizeof(priv->scaling_list_8x8));
+    base_picture->iq_matrix = GST_VAAPI_IQ_MATRIX_NEW(H264, decoder);
+    if (!base_picture->iq_matrix) {
+        GST_ERROR("failed to allocate IQ matrix");
+        return GST_VAAPI_DECODER_STATUS_ERROR_ALLOCATION_FAILED;
     }
+    iq_matrix = base_picture->iq_matrix->param;
+
+    /* XXX: we can only support 4:2:0 or 4:2:2 since ScalingLists8x8[]
+       is not large enough to hold lists for 4:4:4 */
+    if (sps->chroma_format_idc == 3)
+        return GST_VAAPI_DECODER_STATUS_ERROR_UNSUPPORTED_CHROMA_FORMAT;
+
+    fill_iq_matrix_4x4(iq_matrix, pps);
+    fill_iq_matrix_8x8(iq_matrix, pps);
+
     return GST_VAAPI_DECODER_STATUS_SUCCESS;
 }
 
@@ -1993,26 +2051,6 @@ fill_picture(
     return TRUE;
 }
 
-static gboolean
-fill_quant_matrix(GstVaapiDecoderH264 *decoder, GstVaapiPictureH264 *picture)
-{
-    GstVaapiDecoderH264Private * const priv = decoder->priv;
-    VAIQMatrixBufferH264 * const iq_matrix = picture->base.iq_matrix->param;
-
-    /* XXX: we can only support 4:2:0 or 4:2:2 since ScalingLists8x8[]
-       is not large enough to hold lists for 4:4:4 */
-    if (priv->sps->chroma_format_idc == 3 &&
-        sizeof(iq_matrix->ScalingList8x8) != sizeof(priv->scaling_list_8x8))
-        return FALSE;
-
-    /* Fill in VAIQMatrixBufferH264 */
-    memcpy(iq_matrix->ScalingList4x4, priv->scaling_list_4x4,
-           sizeof(iq_matrix->ScalingList4x4));
-    memcpy(iq_matrix->ScalingList8x8, priv->scaling_list_8x8,
-           sizeof(iq_matrix->ScalingList8x8));
-    return TRUE;
-}
-
 static GstVaapiDecoderStatus
 decode_picture(GstVaapiDecoderH264 *decoder, GstH264NalUnit *nalu, GstH264SliceHdr *slice_hdr)
 {
@@ -2038,20 +2076,14 @@ decode_picture(GstVaapiDecoderH264 *decoder, GstH264NalUnit *nalu, GstH264SliceH
     }
     priv->current_picture = picture;
 
-    picture->base.iq_matrix = GST_VAAPI_IQ_MATRIX_NEW(H264, decoder);
-    if (!picture->base.iq_matrix) {
-        GST_ERROR("failed to allocate IQ matrix");
-        return GST_VAAPI_DECODER_STATUS_ERROR_ALLOCATION_FAILED;
-    }
+    priv->sps = sps;
+    priv->pps = pps;
 
-    status = ensure_quant_matrix(decoder, pps);
+    status = ensure_quant_matrix(decoder, picture);
     if (status != GST_VAAPI_DECODER_STATUS_SUCCESS) {
         GST_ERROR("failed to reset quantizer matrix");
         return status;
     }
-
-    priv->sps = sps;
-    priv->pps = pps;
 
     if (!init_picture(decoder, picture, slice_hdr, nalu))
         return GST_VAAPI_DECODER_STATUS_ERROR_UNKNOWN;
@@ -2063,8 +2095,6 @@ decode_picture(GstVaapiDecoderH264 *decoder, GstH264NalUnit *nalu, GstH264SliceH
 static gboolean
 decode_picture_end(GstVaapiDecoderH264 *decoder, GstVaapiPictureH264 *picture)
 {
-    if (!fill_quant_matrix(decoder, picture))
-        return FALSE;
     if (!exec_ref_pic_marking(decoder, picture))
         return FALSE;
     if (!dpb_add(decoder, picture))
