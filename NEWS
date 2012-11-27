@@ -1,9 +1,9 @@
-gst-vaapi NEWS -- summary of changes.  2012-11-DD
+gst-vaapi NEWS -- summary of changes.  2012-11-27
 Copyright (C) 2010-2011 Splitted-Desktop Systems
 Copyright (C) 2011-2012 Intel Corporation
 Copyright (C) 2011 Collabora
 
-Version 0.4.1 - DD.Nov.2012
+Version 0.4.1 - 27.Nov.2012
 * Add support for H.264 interlaced streams
 * Add support for Wayland 1.0 protocol (Robert Bradford)
 * Add upstream bitstream parsers library (codecparsers)
