@@ -1,7 +1,15 @@
-gst-vaapi NEWS -- summary of changes.  2012-11-27
+gst-vaapi NEWS -- summary of changes.  2012-12-DD
 Copyright (C) 2010-2011 Splitted-Desktop Systems
 Copyright (C) 2011-2012 Intel Corporation
 Copyright (C) 2011 Collabora
+
+Version 0.4.2 - DD.Dec.2012
+* Fix H.264 decoding on Cedar Trail platforms
+* Fix MPEG-4 decoding at end-of-stream (Feng Yuan)
+* Fix MPEG-4 decoding when a buffer contains multiple packets (Feng Yuan)
+* Fix memory leak in GstVaapiVideoBuffer for images and surfaces (Feng Yuan)
+* Fix symbols collision between built-in codecparsers/ and system library
+* Use GST_PLUGIN_PATH, if set, to install plugin elements (Halley Zhao)
 
 Version 0.4.1 - 27.Nov.2012
 * Add support for H.264 interlaced streams
