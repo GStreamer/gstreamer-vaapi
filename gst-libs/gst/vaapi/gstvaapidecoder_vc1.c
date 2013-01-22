@@ -254,7 +254,7 @@ decode_sequence(GstVaapiDecoderVC1 *decoder, GstVC1BDU *rbdu, GstVC1BDU *ebdu)
         seq_hdr
     );
     if (result != GST_VC1_PARSER_OK) {
-        GST_DEBUG("failed to parse sequence layer");
+        GST_ERROR("failed to parse sequence layer");
         return get_status(result);
     }
 
@@ -267,7 +267,7 @@ decode_sequence(GstVaapiDecoderVC1 *decoder, GstVC1BDU *rbdu, GstVC1BDU *ebdu)
     case GST_VC1_PROFILE_ADVANCED:
         break;
     default:
-        GST_DEBUG("unsupported profile %d", seq_hdr->profile);
+        GST_ERROR("unsupported profile %d", seq_hdr->profile);
         return GST_VAAPI_DECODER_STATUS_ERROR_UNSUPPORTED_PROFILE;
     }
 
@@ -384,7 +384,7 @@ decode_entry_point(GstVaapiDecoderVC1 *decoder, GstVC1BDU *rbdu, GstVC1BDU *ebdu
         seq_hdr
     );
     if (result != GST_VC1_PARSER_OK) {
-        GST_DEBUG("failed to parse entrypoint layer");
+        GST_ERROR("failed to parse entrypoint layer");
         return get_status(result);
     }
 
@@ -866,7 +866,7 @@ decode_frame(GstVaapiDecoderVC1 *decoder, GstVC1BDU *rbdu, GstVC1BDU *ebdu)
 
     status = ensure_context(decoder);
     if (status != GST_VAAPI_DECODER_STATUS_SUCCESS) {
-        GST_DEBUG("failed to reset context");
+        GST_ERROR("failed to reset context");
         return status;
     }
 
@@ -878,13 +878,13 @@ decode_frame(GstVaapiDecoderVC1 *decoder, GstVC1BDU *rbdu, GstVC1BDU *ebdu)
 
     priv->current_picture = GST_VAAPI_PICTURE_NEW(VC1, decoder);
     if (!priv->current_picture) {
-        GST_DEBUG("failed to allocate picture");
+        GST_ERROR("failed to allocate picture");
         return GST_VAAPI_DECODER_STATUS_ERROR_ALLOCATION_FAILED;
     }
     picture = priv->current_picture;
 
     if (!gst_vc1_bitplanes_ensure_size(priv->bitplanes, seq_hdr)) {
-        GST_DEBUG("failed to allocate bitplanes");
+        GST_ERROR("failed to allocate bitplanes");
         return GST_VAAPI_DECODER_STATUS_ERROR_ALLOCATION_FAILED;
     }
 
@@ -897,7 +897,7 @@ decode_frame(GstVaapiDecoderVC1 *decoder, GstVC1BDU *rbdu, GstVC1BDU *ebdu)
         priv->bitplanes
     );
     if (result != GST_VC1_PARSER_OK) {
-        GST_DEBUG("failed to parse frame layer");
+        GST_ERROR("failed to parse frame layer");
         return get_status(result);
     }
 
@@ -918,7 +918,7 @@ decode_frame(GstVaapiDecoderVC1 *decoder, GstVC1BDU *rbdu, GstVC1BDU *ebdu)
         picture->type   = GST_VAAPI_PICTURE_TYPE_BI;
         break;
     default:
-        GST_DEBUG("unsupported picture type %d", frame_hdr->ptype);
+        GST_ERROR("unsupported picture type %d", frame_hdr->ptype);
         return GST_VAAPI_DECODER_STATUS_ERROR_UNKNOWN;
     }
 
@@ -944,7 +944,7 @@ decode_frame(GstVaapiDecoderVC1 *decoder, GstVC1BDU *rbdu, GstVC1BDU *ebdu)
         ebdu->size + ebdu->offset - ebdu->sc_offset
     );
     if (!slice) {
-        GST_DEBUG("failed to allocate slice");
+        GST_ERROR("failed to allocate slice");
         return GST_VAAPI_DECODER_STATUS_ERROR_ALLOCATION_FAILED;
     }
     gst_vaapi_picture_add_slice(picture, slice);
@@ -1036,7 +1036,7 @@ decode_ebdu(GstVaapiDecoderVC1 *decoder, GstVC1BDU *ebdu)
         status = decode_sequence_end(decoder);
         break;
     default:
-        GST_DEBUG("unsupported BDU type %d", ebdu->type);
+        GST_WARNING("unsupported BDU type %d", ebdu->type);
         status = GST_VAAPI_DECODER_STATUS_ERROR_BITSTREAM_PARSER;
         break;
     }
@@ -1139,12 +1139,12 @@ decode_codec_data(GstVaapiDecoderVC1 *decoder, GstBuffer *buffer)
 
     if (!gst_structure_get_int(structure, "width", &width) ||
         !gst_structure_get_int(structure, "height", &height)) {
-        GST_DEBUG("failed to parse size from codec-data");
+        GST_ERROR("failed to parse size from codec-data");
         return GST_VAAPI_DECODER_STATUS_ERROR_UNKNOWN;
     }
 
     if (!gst_structure_get_fourcc(structure, "format", &format)) {
-        GST_DEBUG("failed to parse profile from codec-data");
+        GST_ERROR("failed to parse profile from codec-data");
         return GST_VAAPI_DECODER_STATUS_ERROR_UNSUPPORTED_CODEC;
     }
 
