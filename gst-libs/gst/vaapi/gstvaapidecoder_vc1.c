@@ -748,6 +748,7 @@ fill_picture(GstVaapiDecoderVC1 *decoder, GstVaapiPicture *picture)
     VAPictureParameterBufferVC1 * const pic_param = picture->param;
     GstVC1SeqHdr * const seq_hdr = &priv->seq_hdr;
     GstVC1FrameHdr * const frame_hdr = &priv->frame_hdr;
+    GstVC1VopDquant * const vopdquant = &frame_hdr->vopdquant;
 
     /* Fill in VAPictureParameterBufferVC1 (common fields) */
     pic_param->forward_reference_picture                            = VA_INVALID_ID;
@@ -773,12 +774,12 @@ fill_picture(GstVaapiDecoderVC1 *decoder, GstVaapiPicture *picture)
     pic_param->pic_quantizer_fields.bits.half_qp                    = frame_hdr->halfqp;
     pic_param->pic_quantizer_fields.bits.pic_quantizer_scale        = frame_hdr->pquant;
     pic_param->pic_quantizer_fields.bits.pic_quantizer_type         = frame_hdr->pquantizer;
-    pic_param->pic_quantizer_fields.bits.dq_frame                   = frame_hdr->vopdquant.dquantfrm;
-    pic_param->pic_quantizer_fields.bits.dq_profile                 = frame_hdr->vopdquant.dqprofile;
-    pic_param->pic_quantizer_fields.bits.dq_sb_edge                 = frame_hdr->vopdquant.dqsbedge;
-    pic_param->pic_quantizer_fields.bits.dq_db_edge                 = frame_hdr->vopdquant.dqsbedge;
-    pic_param->pic_quantizer_fields.bits.dq_binary_level            = frame_hdr->vopdquant.dqbilevel;
-    pic_param->pic_quantizer_fields.bits.alt_pic_quantizer          = frame_hdr->vopdquant.altpquant;
+    pic_param->pic_quantizer_fields.bits.dq_frame                   = vopdquant->dquantfrm;
+    pic_param->pic_quantizer_fields.bits.dq_profile                 = vopdquant->dqprofile;
+    pic_param->pic_quantizer_fields.bits.dq_sb_edge                 = vopdquant->dqprofile == GST_VC1_DQPROFILE_SINGLE_EDGE ? vopdquant->dqbedge : 0;
+    pic_param->pic_quantizer_fields.bits.dq_db_edge                 = vopdquant->dqprofile == GST_VC1_DQPROFILE_DOUBLE_EDGES ? vopdquant->dqbedge : 0;
+    pic_param->pic_quantizer_fields.bits.dq_binary_level            = vopdquant->dqbilevel;
+    pic_param->pic_quantizer_fields.bits.alt_pic_quantizer          = vopdquant->altpquant;
     pic_param->transform_fields.value                               = 0;
     pic_param->transform_fields.bits.transform_ac_codingset_idx1    = frame_hdr->transacfrm;
     pic_param->transform_fields.bits.intra_transform_dc_table       = frame_hdr->transdctab;
