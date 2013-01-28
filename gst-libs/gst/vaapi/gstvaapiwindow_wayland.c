@@ -157,12 +157,16 @@ gst_vaapi_window_wayland_create(
     g_return_val_if_fail(priv_display->compositor != NULL, FALSE);
     g_return_val_if_fail(priv_display->shell != NULL, FALSE);
 
+    GST_VAAPI_OBJECT_LOCK_DISPLAY(window);
     priv->surface = wl_compositor_create_surface(priv_display->compositor);
+    GST_VAAPI_OBJECT_UNLOCK_DISPLAY(window);
     if (!priv->surface)
         return FALSE;
 
+    GST_VAAPI_OBJECT_LOCK_DISPLAY(window);
     priv->shell_surface =
         wl_shell_get_shell_surface(priv_display->shell, priv->surface);
+    GST_VAAPI_OBJECT_UNLOCK_DISPLAY(window);
     if (!priv->shell_surface)
         return FALSE;
 
@@ -217,7 +221,9 @@ gst_vaapi_window_wayland_resize(
 
     if (priv->opaque_region)
         wl_region_destroy(priv->opaque_region);
+    GST_VAAPI_OBJECT_LOCK_DISPLAY(window);
     priv->opaque_region = wl_compositor_create_region(priv_display->compositor);
+    GST_VAAPI_OBJECT_UNLOCK_DISPLAY(window);
     wl_region_add(priv->opaque_region, 0, 0, width, height);
 
     return TRUE;
@@ -299,8 +305,10 @@ gst_vaapi_window_wayland_render(
             &buffer
         );
     }
-    if (!vaapi_check_status(status, "vaGetSurfaceBufferWl()"))
+    if (!vaapi_check_status(status, "vaGetSurfaceBufferWl()")) {
+        GST_VAAPI_OBJECT_UNLOCK_DISPLAY(window);
         return FALSE;
+    }
 
     /* XXX: attach to the specified target rectangle */
     wl_surface_attach(priv->surface, buffer, 0, 0);
