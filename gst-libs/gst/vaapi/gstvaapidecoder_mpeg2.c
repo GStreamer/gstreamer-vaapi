@@ -883,7 +883,7 @@ decode_slice(
     GstBitReader br;
     gint mb_x, mb_y, mb_inc;
     guint macroblock_offset;
-    guint8 slice_vertical_position_extension;
+    guint8 slice_vertical_position_extension = 0;
     guint8 quantiser_scale_code;
     guint8 intra_slice = 0;
     guint8 extra_bit_slice, junk8;
@@ -922,7 +922,7 @@ decode_slice(
     }
     macroblock_offset = gst_bit_reader_get_pos(&br);
 
-    mb_y = slice_no;
+    mb_y = ((guint)slice_vertical_position_extension << 7) + slice_no;
     mb_x = -1;
     do {
         if (!decode_vlc(&br, &mb_inc, mpeg2_mbaddr_vlc_table,
