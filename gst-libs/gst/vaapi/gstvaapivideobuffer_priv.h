@@ -1,7 +1,7 @@
 /*
  *  gstvaapivideobuffer_priv.h - Gstreamer/VA video buffer (private interface)
  *
- *  Copyright (C) 2011 Intel Corporation
+ *  Copyright (C) 2011-2012 Intel Corporation
  *  Copyright (C) 2011 Collabora Ltd.
  *    Author: Nicolas Dufresne <nicolas.dufresne@collabora.co.uk>
  *
