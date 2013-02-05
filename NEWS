@@ -1,9 +1,9 @@
-gst-vaapi NEWS -- summary of changes.  2013-02-DD
+gst-vaapi NEWS -- summary of changes.  2013-02-05
 Copyright (C) 2010-2011 Splitted-Desktop Systems
 Copyright (C) 2011-2013 Intel Corporation
 Copyright (C) 2011 Collabora
 
-Version 0.4.3 - DD.Feb.2013
+Version 0.4.3 - 05.Feb.2013
 * Fix thread-safety issues in the Wayland renderer
 * Fix decoding of MPEG-2 videos with height > 2800 pixels
 * Fix MPEG-2 decoding with explicit quantization matrices set (Cong Zhong)
