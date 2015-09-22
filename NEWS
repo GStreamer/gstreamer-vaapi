@@ -1,7 +1,19 @@
-gst-vaapi NEWS -- summary of changes.  2015-07-15
+gstreamer-vaapi NEWS -- summary of changes.  2015-09-22
 Copyright (C) 2010-2011 Splitted-Desktop Systems
 Copyright (C) 2011-2013 Intel Corporation
 Copyright (C) 2011 Collabora
+
+Version 0.6.1 - 22.Sep.2015
+* Fix a possible segmentation fault using gstreamer 1.4 [#752558]
+* Don't lost the GLTextureUpload meta on seek [#752929]
+* Remove in debian rules the option --with-gstreamer-api  [#753618]
+* Add in debian rules yasm as dependency
+* Keep a copy of input codec state [#753914]
+* Renegotiate if the input caps are not equal [#750835]
+* Fix the FPS denominator and numerator [#755040]
+* Initialize H264 PPS's slice_group_id [#754845]
+* Verify for H264 MVC and H265 SPS when running configure [#754845]
+* Link libgstvaapi_parse.so against libgstcodecparsers.so [#754845]
 
 Version 0.6 - 15.Jul.2015
 * Add HEVC(H265) Decoder
