@@ -932,6 +932,7 @@ ensure_allowed_raw_caps (GstVaapiPluginBase * plugin)
 {
   GArray *formats, *out_formats;
   GstVaapiSurface *surface;
+  GstVaapiDisplay *display;
   guint i;
   GstCaps *out_caps;
   gboolean ret = FALSE;
@@ -942,7 +943,8 @@ ensure_allowed_raw_caps (GstVaapiPluginBase * plugin)
   out_formats = formats = NULL;
   surface = NULL;
 
-  formats = gst_vaapi_display_get_image_formats (plugin->display);
+  display = gst_vaapi_display_ref (plugin->display);
+  formats = gst_vaapi_display_get_image_formats (display);
   if (!formats)
     goto bail;
 
@@ -952,8 +954,7 @@ ensure_allowed_raw_caps (GstVaapiPluginBase * plugin)
     goto bail;
 
   surface =
-      gst_vaapi_surface_new (plugin->display, GST_VAAPI_CHROMA_TYPE_YUV420, 64,
-      64);
+      gst_vaapi_surface_new (display, GST_VAAPI_CHROMA_TYPE_YUV420, 64, 64);
   if (!surface)
     goto bail;
 
@@ -963,7 +964,7 @@ ensure_allowed_raw_caps (GstVaapiPluginBase * plugin)
 
     if (format == GST_VIDEO_FORMAT_UNKNOWN)
       continue;
-    image = gst_vaapi_image_new (plugin->display, format, 64, 64);
+    image = gst_vaapi_image_new (display, format, 64, 64);
     if (!image)
       continue;
     if (gst_vaapi_surface_put_image (surface, image))
@@ -986,6 +987,7 @@ bail:
     g_array_unref (out_formats);
   if (surface)
     gst_vaapi_object_unref (surface);
+  gst_vaapi_display_unref (display);
 
   return ret;
 }
