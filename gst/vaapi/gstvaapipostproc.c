@@ -724,7 +724,7 @@ error_process_vpp:
   }
 error_push_buffer:
   {
-    GST_DEBUG_OBJECT (postproc, "gst_pad_push failed : %s",
+    GST_DEBUG_OBJECT (postproc, "failed to push output buffer: %s",
         gst_flow_get_name (ret));
     return ret;
   }
@@ -801,7 +801,7 @@ error_create_buffer:
   }
 error_push_buffer:
   {
-    GST_DEBUG_OBJECT (postproc, "gst_pad_push failed : %s",
+    GST_DEBUG_OBJECT (postproc, "failed to push output buffer: %s",
         gst_flow_get_name (ret));
     return ret;
   }
