@@ -538,11 +538,7 @@ ensure_srcpad_allocator (GstVaapiPluginBase * plugin, GstVideoInfo * vinfo,
     goto valid_allocator;
 
   plugin->srcpad_allocator = NULL;
-  if (caps && gst_caps_is_video_raw (caps)) {
-    GstAllocator *allocator = create_dmabuf_srcpad_allocator (plugin, vinfo,
-        !plugin->srcpad_can_dmabuf);
-    plugin->srcpad_allocator = allocator;
-  } else if (caps && gst_vaapi_caps_feature_contains (caps,
+  if (caps && gst_vaapi_caps_feature_contains (caps,
           GST_VAAPI_CAPS_FEATURE_DMABUF)) {
     plugin->srcpad_allocator =
         create_dmabuf_srcpad_allocator (plugin, vinfo, FALSE);
